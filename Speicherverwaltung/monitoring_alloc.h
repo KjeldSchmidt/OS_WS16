@@ -29,7 +29,7 @@ typedef struct {
 /* 
  * Initialisiert Speicherverwaltung. 
  *
- * Benötigte Datenstrukturen zur Verwendung in monitoring_alloc_malloc und
+ * Benötigte Datenstrukturen [welche?] zur Verwendung in monitoring_alloc_malloc und
  * monitoring_alloc_free initialisieren.
  *
  */

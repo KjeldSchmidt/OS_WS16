@@ -30,12 +30,17 @@ int shutdown_monitoring_alloc() {
 void *monitoring_alloc_malloc(size_t size) {
   void *allocated = NULL;
 
-  AllocatedMemoryBlock* amb_pointer = malloc( sizeof( AllocatedMemoryBlock ) );
-  amb_pointer->size = size;
-  amb_pointer->frame = malloc( size );
-  amb_pointer->ordinal = allocatedBlocksCounter;
+  if ( allocatedBlocksCounter <= MAX_ALLOCATIONS ) {
+    AllocatedMemoryBlock* amb_pointer = malloc( sizeof( AllocatedMemoryBlock ) );
+    amb_pointer->size = size;
+    amb_pointer->frame = malloc( size );
+    amb_pointer->ordinal = allocatedBlocksCounter;
 
-  allocated = amb_pointer->frame;  
+    allocated_blocks[ allocatedBlocksCounter ] = *amb_pointer;
+
+    allocatedBlocksCounter++;
+    allocated = amb_pointer->frame;  
+  }
 
   if(!allocated) {
     printf("ERROR: Block of size %lu could not be allocated!\n",
@@ -46,6 +51,10 @@ void *monitoring_alloc_malloc(size_t size) {
 
 void monitoring_alloc_free(void *ptr) {
   int found = 0;
+  AllocatedMemoryBlock* amb_pointer = (AllocatedMemoryBlock*) ptr;
+  free( amb_pointer->frame );
+  free( amb_pointer );
+  allocatedBlocksCounter--;
 
   if(!found) {
     printf("ERROR: Block %p not allocated!\n", ptr);
