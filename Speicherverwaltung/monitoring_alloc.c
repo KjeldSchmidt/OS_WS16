@@ -27,6 +27,12 @@ int shutdown_monitoring_alloc() {
   return leakingBytes;
 }
 
+
+void print_amb( int index, unsigned long size ) {
+  AllocatedMemoryBlock amb = allocated_blocks[ index ];
+  printf( "Size: %lu\nOrdinal: %ld\n", (unsigned long) size, amb.ordinal );
+}
+
 void *monitoring_alloc_malloc(size_t size) {
   void *allocated = NULL;
 
@@ -39,7 +45,9 @@ void *monitoring_alloc_malloc(size_t size) {
     allocated_blocks[ allocatedBlocksCounter ] = *amb_pointer;
 
     allocatedBlocksCounter++;
-    allocated = amb_pointer->frame;  
+    allocated = amb_pointer->frame;
+    
+    print_amb( allocatedBlocksCounter, amb_pointer->size );
   }
 
   if(!allocated) {
@@ -48,6 +56,7 @@ void *monitoring_alloc_malloc(size_t size) {
   }
   return allocated;
 }
+
 
 void monitoring_alloc_free(void *ptr) {
   int found = 0;
