@@ -11,10 +11,12 @@
 
 // Datenstrukturen verwendet von den monitoring_alloc Funktionen.
 AllocatedMemoryBlock allocated_blocks[MAX_ALLOCATIONS];
+int allocatedBlocksCounter = 0;
 
 // Schreiben Sie hier ihre Implementierung für Aufgabenteil a).
 
 void init_monitoring_alloc() {
+  
 }
 
 int shutdown_monitoring_alloc() {
@@ -27,6 +29,13 @@ int shutdown_monitoring_alloc() {
 
 void *monitoring_alloc_malloc(size_t size) {
   void *allocated = NULL;
+
+  AllocatedMemoryBlock* amb_pointer = malloc( sizeof( AllocatedMemoryBlock ) );
+  amb_pointer->size = size;
+  amb_pointer->frame = malloc( size );
+  amb_pointer->ordinal = allocatedBlocksCounter;
+
+  allocated = amb_pointer->frame;  
 
   if(!allocated) {
     printf("ERROR: Block of size %lu could not be allocated!\n",
