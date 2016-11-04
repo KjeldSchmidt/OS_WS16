@@ -46,35 +46,35 @@ int main(void) {
 
   // Nicht mehr benötigten Speicher wieder freigeben.
   // Zeiger wird dadurch ungültig, sollte also auf NULL gesetzt werden.
-  if(allocated) { 
+  if(allocated) {
       monitoring_alloc_free(allocated);
       allocated = NULL;
   }
 
   allocated = leaking_function(bar, bar+5);
-  if(allocated) { 
+  if(allocated) {
       monitoring_alloc_free(allocated);
       allocated = NULL;
   }
 
-  if(bar) { 
+  if(bar) {
       monitoring_alloc_free(bar);
       bar = NULL;
   }
 
   allocated = leaking_function(foo, foo+23);
-  if(allocated) { 
+  if(allocated) {
       monitoring_alloc_free(allocated);
       allocated = NULL;
   }
 
   answer = (char*) monitoring_alloc_malloc(42);
   allocated = leaking_function(answer, answer+42);
-  if(allocated) { 
+  if(allocated) {
       monitoring_alloc_free(allocated);
       allocated = NULL;
   }
-  if(answer) { 
+  if(answer) {
       monitoring_alloc_free(answer);
       answer = NULL;
   }
@@ -86,4 +86,3 @@ int main(void) {
 
   return error;
 }
-

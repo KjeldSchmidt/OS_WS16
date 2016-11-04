@@ -10,7 +10,7 @@
 // Verwendet monitoring_alloc.
 #include "monitoring_alloc.h"
 
-/* 
+/*
  * Funktion arbeitet auf übergebenem Speicherbereich und belegt dynamisch neuen
  * Speicher.
  */
@@ -22,11 +22,9 @@ char* leaking_function(char* first, char* last) {
       if(*ptr) {
         allocated = (char*) monitoring_alloc_malloc(
             (*ptr)*sizeof(char) );
-      } 
+      }
       ++ptr;
     }
   }
   return allocated;
 }
-
-

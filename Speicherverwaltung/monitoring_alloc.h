@@ -13,7 +13,7 @@
 #include "malloc.h"
 
 #define MAX_ALLOCATIONS (32)
-#define MAX_TOTAL_ALLOCATION_SIZE (2^10)
+#define MAX_TOTAL_ALLOCATION_SIZE ( 1024 )
 
 /*
  * Die Struktur AllocatedMemoryBlock beinhaltet Informationen über einen
