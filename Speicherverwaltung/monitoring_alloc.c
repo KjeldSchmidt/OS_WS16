@@ -10,7 +10,7 @@
 #include "monitoring_alloc.h"
 
 // Datenstrukturen verwendet von den monitoring_alloc Funktionen.
-AllocatedMemoryBlock allocated_blocks[MAX_ALLOCATIONS];
+AllocatedMemoryBlock* allocated_blocks[MAX_ALLOCATIONS];
 int allocatedBlocksCounter = 0;
 int allocatedSize = 0;
 
@@ -24,9 +24,11 @@ int shutdown_monitoring_alloc() {
   unsigned long leakingBytes = 0;
 
   for ( int i = 0; i < MAX_ALLOCATIONS; i++ ) {
-      if ( allocated_blocks[i].frame != NULL ) {
-        leakingBytes += allocated_blocks[i].size;
+    if ( allocated_blocks[i] != NULL ) {
+      if ( (*allocated_blocks[i]).frame != NULL ) {
+        leakingBytes += (*allocated_blocks[i]).size;
       }
+    }
   }
 
   printf("ERROR: Leaking %lu bytes in total!\n", leakingBytes);
@@ -42,7 +44,7 @@ void *monitoring_alloc_malloc(size_t size) {
     amb_pointer->frame = malloc( size );
     amb_pointer->ordinal = allocatedBlocksCounter;
 
-    allocated_blocks[ allocatedBlocksCounter ] = *amb_pointer;
+    allocated_blocks[ allocatedBlocksCounter ] = amb_pointer;
 
     allocatedBlocksCounter++;
     allocatedSize += size;
@@ -60,20 +62,26 @@ void *monitoring_alloc_malloc(size_t size) {
 
 void monitoring_alloc_free(void *ptr) {
   int found = 0;
+  int indexFound = 0;
 
   AllocatedMemoryBlock* amb_pointer = NULL;
   for ( int i = 0; i < MAX_ALLOCATIONS; i++ ) {
-      if ( allocated_blocks[i].frame == ptr ) {
+    if ( allocated_blocks[i] != NULL ) {
+      if ( (*allocated_blocks[i]).frame == ptr ) {
         found = 1;
-        amb_pointer = &allocated_blocks[i];
+        indexFound = i;
+        amb_pointer = allocated_blocks[i];
       }
+    }
   }
 
-  allocatedSize -= amb_pointer->size;
-  free( amb_pointer->frame );
-  amb_pointer->frame = NULL;
-
-  if(!found) {
+  if ( found ) {
+      allocatedSize -= amb_pointer->size;
+      free( amb_pointer->frame );
+      amb_pointer->frame = NULL;
+      free( allocated_blocks[ indexFound ] );
+      allocated_blocks[ indexFound ] = NULL;
+  } else {
     printf("ERROR: Block %p not allocated!\n", ptr);
   }
 }
