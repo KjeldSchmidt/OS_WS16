@@ -39,16 +39,18 @@ void *monitoring_alloc_malloc(size_t size) {
   void *allocated = NULL;
 
   if ( ( allocatedBlocksCounter < MAX_ALLOCATIONS ) && ( allocatedSize + size < MAX_TOTAL_ALLOCATION_SIZE ) ) {
+
     AllocatedMemoryBlock* amb_pointer = (AllocatedMemoryBlock*) malloc( sizeof( AllocatedMemoryBlock ) );
-    amb_pointer->size = size;
-    amb_pointer->frame = malloc( size );
-    amb_pointer->ordinal = allocatedBlocksCounter;
 
-    allocated_blocks[ allocatedBlocksCounter ] = amb_pointer;
+    if ( amb_pointer != NULL ) {
+      amb_pointer->size = size;
+      amb_pointer->frame = malloc( size );
+      amb_pointer->ordinal = allocatedBlocksCounter;
 
-    allocatedBlocksCounter++;
-    allocatedSize += size;
-    if ( amb_pointer->frame != NULL ) {
+      allocated_blocks[ allocatedBlocksCounter ] = amb_pointer;
+      allocatedBlocksCounter++;
+      allocatedSize += size;
+
       allocated = amb_pointer->frame;
     }
   }
@@ -62,14 +64,14 @@ void *monitoring_alloc_malloc(size_t size) {
 
 void monitoring_alloc_free(void *ptr) {
   int found = 0;
-  int indexFound = 0;
+  int indexToBeDeleted = 0;
 
   AllocatedMemoryBlock* amb_pointer = NULL;
   for ( int i = 0; i < MAX_ALLOCATIONS; i++ ) {
     if ( allocated_blocks[i] != NULL ) {
       if ( (*allocated_blocks[i]).frame == ptr ) {
         found = 1;
-        indexFound = i;
+        indexToBeDeleted = i;
         amb_pointer = allocated_blocks[i];
       }
     }
@@ -79,8 +81,8 @@ void monitoring_alloc_free(void *ptr) {
       allocatedSize -= amb_pointer->size;
       free( amb_pointer->frame );
       amb_pointer->frame = NULL;
-      free( allocated_blocks[ indexFound ] );
-      allocated_blocks[ indexFound ] = NULL;
+      free( allocated_blocks[ indexToBeDeleted ] );
+      allocated_blocks[ indexToBeDeleted ] = NULL;
   } else {
     printf("ERROR: Block %p not allocated!\n", ptr);
   }
