@@ -16,7 +16,7 @@ int allocatedBlocksCounter = 0;
 // Schreiben Sie hier ihre Implementierung für Aufgabenteil a).
 
 void init_monitoring_alloc() {
-  
+
 }
 
 int shutdown_monitoring_alloc() {
@@ -27,16 +27,10 @@ int shutdown_monitoring_alloc() {
   return leakingBytes;
 }
 
-
-void print_amb( int index, unsigned long size ) {
-  AllocatedMemoryBlock amb = allocated_blocks[ index ];
-  printf( "Size: %lu\nOrdinal: %ld\n", (unsigned long) size, amb.ordinal );
-}
-
 void *monitoring_alloc_malloc(size_t size) {
   void *allocated = NULL;
 
-  if ( allocatedBlocksCounter <= MAX_ALLOCATIONS ) {
+  if ( ( allocatedBlocksCounter <= MAX_ALLOCATIONS ) ) {
     AllocatedMemoryBlock* amb_pointer = malloc( sizeof( AllocatedMemoryBlock ) );
     amb_pointer->size = size;
     amb_pointer->frame = malloc( size );
@@ -45,9 +39,9 @@ void *monitoring_alloc_malloc(size_t size) {
     allocated_blocks[ allocatedBlocksCounter ] = *amb_pointer;
 
     allocatedBlocksCounter++;
-    allocated = amb_pointer->frame;
-    
-    print_amb( allocatedBlocksCounter, amb_pointer->size );
+    if ( amb_pointer->frame != NULL ) {
+      allocated = amb_pointer;
+    }
   }
 
   if(!allocated) {
@@ -69,4 +63,3 @@ void monitoring_alloc_free(void *ptr) {
     printf("ERROR: Block %p not allocated!\n", ptr);
   }
 }
-
