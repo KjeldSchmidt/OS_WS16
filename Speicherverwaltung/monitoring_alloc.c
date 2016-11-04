@@ -12,7 +12,6 @@
 // Datenstrukturen verwendet von den monitoring_alloc Funktionen.
 AllocatedMemoryBlock allocated_blocks[MAX_ALLOCATIONS];
 int allocatedBlocksCounter = 0;
-int totalAllocatedSize = 0;
 int allocatedSize = 0;
 
 // Schreiben Sie hier ihre Implementierung für Aufgabenteil a).
@@ -23,8 +22,6 @@ void init_monitoring_alloc() {
 
 int shutdown_monitoring_alloc() {
   unsigned long leakingBytes = 0;
-
-  printf("Total Allocated Bytes: %d\n",totalAllocatedSize );
 
   for ( int i = 0; i < MAX_ALLOCATIONS; i++ ) {
       if ( allocated_blocks[i].frame != NULL ) {
@@ -39,9 +36,7 @@ int shutdown_monitoring_alloc() {
 void *monitoring_alloc_malloc(size_t size) {
   void *allocated = NULL;
 
-  printf("Requested %lu bytes\n", size );
-
-  if ( ( allocatedBlocksCounter <= MAX_ALLOCATIONS ) && ( allocatedSize + size < MAX_TOTAL_ALLOCATION_SIZE ) ) {
+  if ( ( allocatedBlocksCounter < MAX_ALLOCATIONS ) && ( allocatedSize + size < MAX_TOTAL_ALLOCATION_SIZE ) ) {
     AllocatedMemoryBlock* amb_pointer = (AllocatedMemoryBlock*) malloc( sizeof( AllocatedMemoryBlock ) );
     amb_pointer->size = size;
     amb_pointer->frame = malloc( size );
@@ -51,15 +46,13 @@ void *monitoring_alloc_malloc(size_t size) {
 
     allocatedBlocksCounter++;
     allocatedSize += size;
-    totalAllocatedSize += size;
     if ( amb_pointer->frame != NULL ) {
       allocated = amb_pointer->frame;
     }
   }
 
-  if(!allocated) {
-    printf("ERROR: Block of size %lu could not be allocated!\n",
-        (unsigned long)size);
+  if( !allocated ) {
+    printf( "ERROR: Block of size %lu could not be allocated!\n", (unsigned long) size );
   }
   return allocated;
 }
@@ -77,10 +70,8 @@ void monitoring_alloc_free(void *ptr) {
   }
 
   allocatedSize -= amb_pointer->size;
-
   free( amb_pointer->frame );
   amb_pointer->frame = NULL;
-  amb_pointer->size = 0;
 
   if(!found) {
     printf("ERROR: Block %p not allocated!\n", ptr);
