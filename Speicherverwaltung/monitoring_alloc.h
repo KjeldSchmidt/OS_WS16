@@ -19,7 +19,7 @@
  * Die Struktur AllocatedMemoryBlock beinhaltet Informationen über einen
  * belegten Speicherblock.
  */
-typedef struct AllocatedMemoryBlock {
+typedef struct {
   void *  frame;    // Zeiger auf den Begin des Speicherblocks
   size_t  size;     // Größe des belegten Speicherblocks
   size_t  ordinal;  // Laufende Nummer der Vergabe
