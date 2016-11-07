@@ -47,14 +47,14 @@ int binarySearch(node_t *tree, int value){
   if ( tree->value == value ) {                         // Well, if the value is at the current node, then clearly,
     return 1;                                           // we've found the value and return 1.
   }
-  
-  if ( tree->left != NULL ) {                           // If not, see if a left node exists, and if yes, search it recursively.
+
+  if ( tree->value < value && tree->left != NULL ) {    // If not, see if the vaue could be in the left node, if a left node exists, and if so, search it recursively.
     if ( binarySearch( tree->left, value ) == 1 ) {     // If we find it...
       return 1;                                         // Return 1! Note: We cannot return the result of binary seach directly, for even if it is 0, it might be in the right branch.
     }
   }
 
-  if ( tree->right != NULL ) {                          // Same as above.
+  if ( tree->value > value && tree->right != NULL ) {   // Same as above.
     if ( binarySearch( tree->right, value ) == 1 ) {    // Note: This time we _could_ actually just return the result straight
       return 1;                                         // But for readability, we leave the return 0 to the very end of the function.
     }

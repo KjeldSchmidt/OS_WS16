@@ -20,9 +20,8 @@ int main(void) {
   if (binarySearch(root, 42)) {
     printf("42 found in tree\n");
   }
-  
+
   cleanUpTree(root);
 
   return 0;
 }
-
