@@ -22,7 +22,7 @@ int allocatedSize = 0;                                  // Checks the total size
  */
 void init_monitoring_alloc() {
   AllocatedMemoryBlock AMB;                          // Creating an instance.
-  AMB.frame = NULL;                                  // Setting defautl values - very important, since C does not initialize with default values!
+  AMB.frame = NULL;                                  // Setting default values - very important, since C does not initialize with default values!
   AMB.size = 0;
   AMB.ordinal = 0;
   for ( size_t i = 0; i < MAX_ALLOCATIONS ; ++i ) {
@@ -116,7 +116,7 @@ void monitoring_alloc_free(void *ptr) {
   for ( int i = 0; i < MAX_ALLOCATIONS; i++ ) {    // Check all allocated_blocks...
     if ( allocated_blocks[i].frame == ptr ) {		   // To check it's frame against *ptr.
       found = 1;                                   // Found the correct AMB.
-      indexToBeDeleted = i;                        // And it's array index..
+      indexToBeDeleted = i;                        // And it's array index.
     }
   }
 
