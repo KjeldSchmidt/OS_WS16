@@ -51,6 +51,14 @@ int shutdown_monitoring_alloc() {
   return leakingBytes;
 }
 
+int getEmptyAMBIndex() {                          // Find an AMB index that is currently free.
+  for ( int i = 0; i < MAX_ALLOCATIONS; ++i ) {   // By checking all entries
+    if ( allocated_blocks[i].frame == NULL ) {    // To find the one with a null frame.
+      return i;                                   // Return the first one; We don't care.
+    }
+  }
+  return -1;                                      // -1 if there is no free AMB. Note: Never happens as of the writing of this comment.
+}
 
 /*
  *	Used to allocate memory with monitoring.
@@ -63,18 +71,18 @@ void *monitoring_alloc_malloc(size_t size) {
 
   if ( ( allocatedBlocksCounter < MAX_ALLOCATIONS ) && ( allocatedSize + size < MAX_TOTAL_ALLOCATION_SIZE ) ) {	// If our hardcoded constraints are met
 
-    AllocatedMemoryBlock* amb_pointer = (AllocatedMemoryBlock*) malloc( sizeof( AllocatedMemoryBlock ) );		// Try to allocate an AMB.
+    int ambIndex = getEmptyAMBIndex();
 
-    if ( amb_pointer != NULL ) {																				// This might already fail, so check for NULL,
-      amb_pointer->size = size;																					// Set the size. This is only needed later on, when we check for leaks.
-      amb_pointer->frame = malloc( size );																		// Attempt to allocate the requested memory.
-      amb_pointer->ordinal = allocatedBlocksCounter;															// Set the ordinal. We never use this, but it's part of the struct declaration.
+    if ( ambIndex != -1 ) {																				// This might already fail, so check for NULL,
+      allocated_blocks[ ambIndex ].size = size;																					// Set the size. This is only needed later on, when we check for leaks.
+      allocated_blocks[ ambIndex ].frame = malloc( size );																		// Attempt to allocate the requested memory.
+      allocated_blocks[ ambIndex ].ordinal = allocatedBlocksCounter;															// Set the ordinal. We never use this, but it's part of the struct declaration.
 
       //allocated_blocks[ allocatedBlocksCounter ] = amb_pointer;													// Insert the AMB-pointer into the apropriate array.
       allocatedBlocksCounter++;																					// Increment the number of allocations done so far.
       allocatedSize += size;																					// And add to the number of currently allocated space, since we have to observe a maximum.
 
-      allocated = amb_pointer->frame;																			// Set the pointer-to-be-returned to the AMB's frame. This is required so the user can use the
+      allocated = allocated_blocks[ ambIndex ].frame;																			// Set the pointer-to-be-returned to the AMB's frame. This is required so the user can use the
     }																											// returned pointer directly, and not mess with our AMB.
   }
 
@@ -94,7 +102,7 @@ void monitoring_alloc_free(void *ptr) {
   int indexToBeDeleted = 0;								// The index of allocated_blocks where we have found the AMB.
 
   for ( int i = 0; i < MAX_ALLOCATIONS; i++ ) {			// Check all allocated_blocks...
-    if ( allocated_blocks[i].frame == NULL ) {				// if they aren't NULL.
+    if ( allocated_blocks[i].frame != NULL ) {				// if they aren't NULL.
       if ( allocated_blocks[i].frame == ptr ) {		// Dereference the pointer saved in the array, which gives an AMB. Compare it's frame to ptr.
         found = 1;										// Found the correct AMB.
         indexToBeDeleted = i;							// This is the array index for it.
@@ -104,10 +112,9 @@ void monitoring_alloc_free(void *ptr) {
 
   if ( found ) {										// If we've found the AMB
       allocatedSize -= allocated_blocks[ indexToBeDeleted ].size;				// First, subtract the size from the total allocated size, so we may reuse it.
+      allocatedBlocksCounter--;
       free( allocated_blocks[ indexToBeDeleted ].frame );						// Free the frame first! If we started with the AMB, we wouldn't even have the access to the frame anymore.
       allocated_blocks[ indexToBeDeleted ].frame = NULL;						// Set the pointer to NULL. That's just common courtesey.
-
-      													// because amb_pointer is in local scope and anything we do to it will be meaningless at the end of this function.
 
   } else {												// If we haven't found an AMB with the frame, however, we can't delete anything,
     printf("ERROR: Block %p not allocated!\n", ptr);	// And must inform the user of this sad fact. A proper implementation of this would most likely return a status code instead of printing.
