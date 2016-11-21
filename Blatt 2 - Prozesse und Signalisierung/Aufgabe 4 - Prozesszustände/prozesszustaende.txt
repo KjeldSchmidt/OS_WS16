@@ -1,0 +1,5 @@
+    -- -- 31 32 33 -- 11 12 13 -- 21 22 -- 14 -- 34 -- 41 42 -- 23 -- 35 36 -- 43
+P1: N  N  R  R  R  A  A  A  B  B  R  R  A  N  N  N  N  N  N  N  N  N  N  N  N  N
+P2: N  N  N  N  N  N  R  R  R  A  A  B  B  B  B  B  B  R  R  A  N  N  N  N  N  N
+P3: R  A  A  A  B  B  B  B  B  B  R  R  R  R  A  B  B  R  R  R  R  A  A  N  N  N
+P4: N  N  N  R  R  R  R  R  R  R  R  R  R  R  R  R  A  A  B  B  B  B  R  R  A  N
