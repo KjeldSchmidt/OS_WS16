@@ -7,4 +7,3 @@ typedef struct {
 typedef struct {
   char time[255];
 } time_respond_t;
-

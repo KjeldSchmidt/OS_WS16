@@ -26,7 +26,7 @@ void err(char *msg)
 // global listen socket
 int listenSoc;
 
-void shutdownTimeServer(int param)
+void shutdownTimeServer() //used to have paramater "int param" 
 {
   printf("shutting down time server\n");
   // close listen socket on shutdown
@@ -58,7 +58,7 @@ int createListenSocket()
     printf("getaddrinfo failed %s\n", gai_strerror(retval));
     exit(EXIT_FAILURE);
   }
-  
+
   // bind socket to address
   retval = bind(soc, info->ai_addr, info->ai_addrlen);
   // release memory used by info
@@ -127,7 +127,7 @@ void sendTimeRespond(int connectionSoc, const time_respond_t* timeRespond)
 }
 
 
-int main(int argc, char *argv[])
+int main()
 {
   // register shutdown method for SIGINT
   // server can be stopped using ^C
@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
 
   // create listening socket
   listenSoc = createListenSocket();
-  
+
   // forever ...
   while (1) {
     // ... take incoming connections
@@ -165,4 +165,3 @@ int main(int argc, char *argv[])
   // the while loop above can only be exit using the signal handler
   exit(EXIT_FAILURE);
 }
-
