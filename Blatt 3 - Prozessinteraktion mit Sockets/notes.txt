@@ -1,0 +1,5 @@
+1) shutdownTimeServer used to have paramter "int param", which prevented compilation. Valid to remove?
+
+2) Socket might not be filled be the time we try to read - handled automatically?
+
+3) Wow that was easy what

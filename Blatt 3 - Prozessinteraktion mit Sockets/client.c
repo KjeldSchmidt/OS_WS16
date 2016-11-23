@@ -23,17 +23,13 @@ void err(char *msg)
 // create a new socket
 int createSocket()
 {
-  int soc;
-  soc = socket(AF_INET, SOCK_STREAM, 0);
-  return soc;
+  return socket(AF_INET, SOCK_STREAM, 0);;
 }
 
 // connect given socket soc to server at "localhost" on port "2342"
 void connectToTimeServer(int soc)
 {
   if ( soc != -1 ) {
-
-    // specify information about the hostname and port to use
     struct addrinfo hints;
     struct addrinfo *info;
 
@@ -42,13 +38,8 @@ void connectToTimeServer(int soc)
     hints.ai_socktype = SOCK_STREAM;  // use TCP as protocol
     hints.ai_flags = AI_PASSIVE;      // this side is used as the server
 
-    // turn hostname and port information in addrinfo struct
-    // information in hints is used as a hint to fill info
-    int retval = getaddrinfo("localhost", "2342", &hints, &info);
-    retval++; //nonsense
-
+    getaddrinfo("localhost", "2342", &hints, &info);
     connect(soc, info->ai_addr, info->ai_addrlen);
-
   }
 }
 
