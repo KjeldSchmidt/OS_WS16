@@ -56,7 +56,7 @@ void connectToTimeServer(int soc)
 void sendTimeRequest(int soc, const time_request_t* timeRequest)
 {
   if ( soc != -1 && timeRequest != NULL ) {
-    send( soc, timeRequest, sizeof( timeRequest ), 0);
+    send( soc, timeRequest, sizeof( time_request_t ), 0);
   }
 }
 
@@ -64,7 +64,8 @@ void sendTimeRequest(int soc, const time_request_t* timeRequest)
 void receiveTimeRespond(int soc, time_respond_t* timeRespond)
 {
   if ( soc != -1 && timeRespond != NULL ) {
-    soc++; //nonsense
+    int bytesReceived = recv(soc, (void *)timeRespond, sizeof(time_respond_t), 0);
+    if (bytesReceived < 0) { close(soc); err("error while receiving"); }
   }
 }
 

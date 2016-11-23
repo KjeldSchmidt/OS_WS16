@@ -26,7 +26,7 @@ void err(char *msg)
 // global listen socket
 int listenSoc;
 
-void shutdownTimeServer() //used to have paramater "int param" 
+void shutdownTimeServer() //NOTE: used to have paramater "int param"
 {
   printf("shutting down time server\n");
   // close listen socket on shutdown
