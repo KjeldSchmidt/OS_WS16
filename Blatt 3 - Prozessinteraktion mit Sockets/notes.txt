@@ -2,3 +2,5 @@ Die Funktion shutdownTimeServer hatte in der bereitgestellten Version den Parame
 Da dieser nicht verwendet wurde haben die strikten Kompilationsregeln eine erfolgreiche Kompilation verhindert.
 Wir haben diesen Parameter entfernt.
 
+Eine Sorge die wir hatten war, dass der Socket unter Umständen nicht hinreichend mit Daten gefüllt würde (etwa weil der Prozess timeServer nicht schnell genug Antworten kann).
+Leider fanden wir keine angemessene Möglichkeit auf eine Antwort zu warten, ohne deren exakte Länge zu kennen.
