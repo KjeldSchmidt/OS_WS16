@@ -1,6 +1,6 @@
 S15: RR - Round Robin
 S13: LCFS-PR - LIFO - Verdrängung mit direkter Wiederaufnahme.
-S26: Multilevel Feedback
+S27: Multilevel Feedback
 
 Aufgabe 7)a):
 
@@ -27,19 +27,19 @@ P5                          XXXX          XXXX  XX
 
 
 
-Multilevel Feedback:
+Multilevel Feedback (10 * (i + 1)):
     1    23   45
     00  20  40  60  80  100 120 140 160 180 200 220 240 260
-P1
-P2
-P3
-P4
-P5
+P1  112222                        333333
+P2        11      2222                  3333
+P3          11        2222                  33
+P4            11          2222
+P5              11            2222            3333
 
 
 
 
-Aufgabe 7)b):
+Aufgabe 7)b): (Berechnung beschrieben auf Seite 18)
 
 LCFS-PR:
                                   P1:           P4:
