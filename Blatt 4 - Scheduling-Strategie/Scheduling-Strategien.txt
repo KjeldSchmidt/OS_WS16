@@ -1,0 +1,40 @@
+Aufgabe 7)a):
+
+LCFS-PR:
+
+
+
+
+RR (Zeitquantum 20):
+
+
+
+
+Multilevel Feedback:
+
+
+
+
+Aufgabe 7)b):
+
+LCFS-PR:
+                                  P1:           P4:
+Bedienzeit:
+Antwortzeit:
+Wartezeit:
+Normalisierte Antwortzeit:
+
+RR (Zeitquantum 20):
+                                  P1:           P4:
+Bedienzeit:
+Antwortzeit:
+Wartezeit:
+Normalisierte Antwortzeit:
+
+
+Multilevel Feedback:
+                                  P1:           P4:
+Bedienzeit:
+Antwortzeit:
+Wartezeit:
+Normalisierte Antwortzeit:
