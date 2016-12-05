@@ -1,3 +1,7 @@
+S15: RR - Round Robin
+S13: LCFS-PR - LIFO - Verdrängung mit direkter Wiederaufnahme.
+S26: Multilevel Feedback
+
 Aufgabe 7)a):
 
 LCFS-PR:
