@@ -7,11 +7,11 @@ Aufgabe 7)a):
 LCFS-PR:
     1    23   45
     00  20  40  60  80  100 120 140 160 180 200 220 240 260
-P1
-P2
-P3
-P4
-P5
+P1  XXXXX                XXXXXXX
+P2       X                      XXXXXXXXX
+P3        XXXX                           XXXX
+P4            X                              XXXXX
+P5             XXXXXXXXXX
 
 
 
