@@ -1,7 +1,3 @@
-S15: RR - Round Robin
-S13: LCFS-PR - LIFO - Verdrängung mit direkter Wiederaufnahme.
-S27: Multilevel Feedback
-
 Aufgabe 7)a):
 
 LCFS-PR:
@@ -41,24 +37,28 @@ P5              00            1111            2222
 
 Aufgabe 7)b): (Berechnung beschrieben auf Seite 18)
 
-LCFS-PR:
-                                  P1:           P4:
-Bedienzeit:
-Antwortzeit:
-Wartezeit:
-Normalisierte Antwortzeit:
+LCFS-PR:					P1			P4
+Bedienzeit:					60			30
+Antwortzeit:				140			180
+Wartezeit:					80			150
+Normalisierte Antwortzeit:	2,33			6,00
 
-RR (Zeitquantum 20):
-                                  P1:           P4:
-Bedienzeit:
-Antwortzeit:
-Wartezeit:
-Normalisierte Antwortzeit:
+RR (Zeitquantum 20):		P1			P4
+Bedienzeit:					60			30
+Antwortzeit:				100			140
+Wartezeit:					40			110
+Normalisierte Antwortzeit:	1,66			4,66
 
 
-Multilevel Feedback:
-                                  P1:           P4:
-Bedienzeit:
-Antwortzeit:
-Wartezeit:
-Normalisierte Antwortzeit:
+Multilevel Feedback:		P1 			P4
+Bedienzeit:					60			30
+Antwortzeit:				180			80
+Wartezeit:					120			50
+Normalisierte Antwortzeit:	3,00			2,66
+
+
+Durchschnitt:				P1 			P4
+Bedienzeit:					60			30
+Antwortzeit:				140			133
+Wartezeit:					80			103
+Normalisierte Antwortzeit:	3,33			4,44
