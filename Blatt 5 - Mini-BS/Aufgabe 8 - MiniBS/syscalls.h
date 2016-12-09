@@ -1,3 +1,5 @@
+#define _POSIX_C_SOURCE 200809L
+
 #ifndef __syscalls_h
 #define __syscalls_h
 
@@ -5,7 +7,7 @@
 int create_process(void (*function)(int));
 
 /* Wartet auf Beendigung von Prozess pid und gibt die mit pid verbundenen
- * Ressourcen frei.  
+ * Ressourcen frei.
  * Wenn Prozess pid schon beendet wurde kehrt die Funktion gleich zurueck.  Wenn
  * Prozess pid noch nicht beendet ist blockiert die Funktion bis zu dessen Ende.
  * Es wird nicht ueberprueft, ob pid existiert (ist pid ungueltig, blockiert die

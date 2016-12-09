@@ -1,9 +1,10 @@
 #ifndef __PROCESS_MANAGER_H
 #define __PROCESS_MANAGER_H
+#define _POSIX_C_SOURCE 200809L
 
 #include <ucontext.h>
 
-/* 
+/*
  *
  * Datentypen und globale Variablen
  *
@@ -86,7 +87,7 @@ process_t *queue_get_process(pqueue_t *queue, int pid);
  * Liefert NULL falls pid nicht in queue */
 process_t *queue_get_process_waiting_for(pqueue_t *queue, int waitpid);
 
-/* process aus queue entfernen 
+/* process aus queue entfernen
  * liefert -1 falls process nicht in queue, sonst 0 */
 int queue_dequeue(pqueue_t *queue, process_t *proc);
 

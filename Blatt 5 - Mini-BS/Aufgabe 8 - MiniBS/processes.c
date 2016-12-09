@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include "syscalls.h"
 
 
@@ -6,11 +7,11 @@ static int bed[4]; /* Bedingungsvariablen */
 /* Warten mit freigabe */
 
 
-void proc1(int);
-void proc2(int);
-void proc3(int);
+void proc1();
+void proc2();
+void proc3();
 
-void proc1(int pid) {
+void proc1() {
   int i;
   int pid1, pid2;
 
@@ -43,10 +44,10 @@ void proc1(int pid) {
   return;
 }
 
-void proc2(int pid) {
+void proc2() {
   println("P2: setzt Bed. B1 auf wahr");
   mbs_signal(bed[0]);
-  
+
   println("P2: wartet auf Bed. B4");
   mbs_swait(bed[3]);
 
@@ -54,7 +55,7 @@ void proc2(int pid) {
   return;
 }
 
-void proc3(int pid) {
+void proc3() {
   println("P3: setzt Bed. B2 auf wahr");
   mbs_signal(bed[1]);
 
@@ -71,11 +72,11 @@ void proc3(int pid) {
  */
 
 
-void bw_proc1(int);
-void bw_proc2(int);
-void bw_proc3(int);
+void bw_proc1();
+void bw_proc2();
+void bw_proc3();
 
-void bw_proc1(int pid) {
+void bw_proc1() {
   int i;
   int pid1, pid2;
 
@@ -107,10 +108,10 @@ void bw_proc1(int pid) {
   return;
 }
 
-void bw_proc2(int pid) {
+void bw_proc2() {
   println("P2: setzt Bed. B1 auf wahr");
   bed[0] = 1;
-  
+
   println("P2: wartet auf Bed. B4");
   while (!bed[3]) ;
 
@@ -118,7 +119,7 @@ void bw_proc2(int pid) {
   return;
 }
 
-void bw_proc3(int pid) {
+void bw_proc3() {
   println("P3: setzt Bed. B2 auf wahr");
   bed[1] = 1;
 
@@ -131,7 +132,7 @@ void bw_proc3(int pid) {
 
 
 
-void init(int pid) {
+void init() {
   int p;
 
   println("mbs_signal/mbs_wait");
@@ -144,4 +145,3 @@ void init(int pid) {
 
   println("done");
 }
-

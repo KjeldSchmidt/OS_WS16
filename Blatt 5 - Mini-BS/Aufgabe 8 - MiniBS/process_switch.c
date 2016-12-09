@@ -2,6 +2,8 @@
  * Diese Datei darf nicht veraendert werden.
  */
 
+#define _POSIX_C_SOURCE 200809L
+
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,21 +15,21 @@
 
 static ucontext_t error_context;
 
-/* Funktion, die aufgerufen wird, wenn ein Prozess aus der Funktion 
+/* Funktion, die aufgerufen wird, wenn ein Prozess aus der Funktion
  * process_wrapper zurueckkehrt */
-void error_function() 
+void error_function()
 {
   fprintf(stderr, "Error: error_function reached.\n");
-  if (active_process!=NULL) 
+  if (active_process!=NULL)
     fprintf(stderr, "active_process->pid==%d\n", active_process->pid);
   exit(EXIT_FAILURE);
 }
 
 
-/* Initialisiert statische Daten die innerhalb dieses Moduls verwendet werden 
+/* Initialisiert statische Daten die innerhalb dieses Moduls verwendet werden
  * Muss einmal zu Beginn ausgefuehrt werden bevor andere Funktionen aus dieser
  * Datei ausgefuehrt werden duerfen. */
-void init_process_switch() 
+void init_process_switch()
 {
   if (getcontext(&error_context) == -1) {
     fprintf(stderr, "Error: Could not create initial process context\n");
@@ -38,14 +40,14 @@ void init_process_switch()
   error_context.uc_stack.ss_size = STACK_SIZE;
 
   makecontext (&error_context, (void (*) (void)) error_function, 0);
-  
+
 }
 
 
 /* Initialisiert den Kontext der Prozessstruktur p so, dass die Funktion
  * wrapper_process mit p als Parameter aufgerufen wird, so bald Prozess p das
  * erste Mal ausgefuehrt wird. */
-void init_process(process_t *p) 
+void init_process(process_t *p)
 {
   if (getcontext(&(p->context)) == -1) {
     fprintf(stderr, "Error: Could not create process context\n");
@@ -81,6 +83,3 @@ void switch_process(process_t *oldp, process_t *newp)
     swapcontext(&(oldp->context), &(newp->context));
   }
 }
-
-
-

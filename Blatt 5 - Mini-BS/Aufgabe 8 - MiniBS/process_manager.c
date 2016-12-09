@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/time.h>
@@ -14,10 +15,18 @@ pqueue_t zombie_queue;
 
 process_t *active_process;
 
-
+void handleSigprof( int signum ) {
+  printf("SIGINT SIGNAL SEND!%d\n", signum );
+}
 /* Hauptfunktion dient zum initialisieren und starten des ersten Prozesses */
-int main(int argc, char **argv) 
+int main()
 {
+  struct sigaction handler;
+  handler.sa_handler = handleSigprof;
+  sigemptyset( &handler.sa_mask );
+  handler.sa_flags = 0;
+  sigaction( SIGINT, &handler, NULL );
+
   init_process_switch(); /* Prozessumschaltung initialisieren */
 
   init_mbs_signal_module(); /* Signale initialisieren */
@@ -68,11 +77,11 @@ void process_wrapper(process_t *proc) {
 
 /* Sucht den naechsten auszufuehrenden Prozess aus und ruft switch_process in
  * process_switch.c auf */
-void schedule() 
+void schedule()
 {
   process_t *old_proc = NULL; /* bisheriger Prozess */
   /* zu Beginn, wenn noch kein Prozess laeuft ist active_process==NULL */
-  if (active_process != NULL) { 
+  if (active_process != NULL) {
     /* active_process in die richtige queue einhaengen */
     switch(active_process->state) {
       case STATE_RUNNABLE:
@@ -102,22 +111,14 @@ void schedule()
   }
 }
 
-/* naechsten auszufuehrenden Prozess auswaehlen 
+/* naechsten auszufuehrenden Prozess auswaehlen
  * -- waehlt den lauffaehigen Prozess mit der kleinsten PID aus */
-process_t *select_next_process()
-{
-  process_t *proc;
-  int smallest_pid = INT_MAX; /* INT_MAX = groesster Wert in einem int */
-
-  if (run_queue.first == NULL)
+process_t *select_next_process() {
+  if (run_queue.first == NULL) {
     return NULL;
-
-  for ( proc = run_queue.first; proc != NULL; proc = proc->next) {
-    if (proc->pid < smallest_pid) {
-      smallest_pid = proc->pid;
-    }
   }
-  return queue_get_process(&run_queue, smallest_pid);
+
+  return queue_get_process(&run_queue, run_queue.first->pid);
 }
 
 /*
@@ -127,7 +128,7 @@ process_t *select_next_process()
  */
 
 /* Anfuegen von p an das Ende von queue */
-void queue_append(pqueue_t *queue, process_t *p) 
+void queue_append(pqueue_t *queue, process_t *p)
 {
   p->next = NULL;
   if (queue->first == NULL) { /* queue is empty */
@@ -142,7 +143,7 @@ void queue_append(pqueue_t *queue, process_t *p)
 }
 
 /* Ersten Eintrag aus queue entfernen und zurueckliefern */
-process_t *queue_get_head(pqueue_t *queue) 
+process_t *queue_get_head(pqueue_t *queue)
 {
   process_t *result = queue->first;
 
@@ -157,7 +158,7 @@ process_t *queue_get_head(pqueue_t *queue)
 
 /* Eintrag mit pid in queue suchen, austragen und zurueckliefern
  * Liefert NULL falls pid nicht in queue */
-process_t *queue_get_process(pqueue_t *queue, int pid) 
+process_t *queue_get_process(pqueue_t *queue, int pid)
 {
   process_t *proc;
 
@@ -172,7 +173,7 @@ process_t *queue_get_process(pqueue_t *queue, int pid)
 
 /* Eintrag suchen der auf waitpid wartet, austragen und zurueckliefern
  * Liefert NULL falls pid nicht in queue */
-process_t *queue_get_process_waiting_for(pqueue_t *queue, int waitpid) 
+process_t *queue_get_process_waiting_for(pqueue_t *queue, int waitpid)
 {
   process_t *proc;
 
@@ -185,9 +186,9 @@ process_t *queue_get_process_waiting_for(pqueue_t *queue, int waitpid)
   return NULL;
 }
 
-/* process aus queue entfernen 
+/* process aus queue entfernen
  * liefert -1 falls process nicht in queue, sonst 0 */
-int queue_dequeue(pqueue_t *queue, process_t *process) 
+int queue_dequeue(pqueue_t *queue, process_t *process)
 {
   process_t *result = queue->first;
   process_t *previous = NULL;
@@ -203,13 +204,10 @@ int queue_dequeue(pqueue_t *queue, process_t *process)
         queue->last = previous;
       result->next = NULL;
       return 0;
-    } 
+    }
 
     previous = result;
     result = result->next;
   }
   return -1;
 }
-
-
-
