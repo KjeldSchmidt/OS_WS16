@@ -15,17 +15,53 @@ pqueue_t zombie_queue;
 
 process_t *active_process;
 
-void handleSigprof( int signum ) {
-  printf("SIGINT SIGNAL SEND!%d\n", signum );
+void handleSigprof() {
+  schedule();
 }
+
+void err(char *msg)
+{
+  perror(msg);
+  exit(EXIT_FAILURE);
+}
+
+void registerSigprofHandler() {
+  int syscallCheck;
+  struct sigaction handler;
+
+  handler.sa_handler = handleSigprof;
+  syscallCheck = sigemptyset( &handler.sa_mask );
+  if ( syscallCheck == - 1 ) {
+     err( "sigemptyset failed" );
+  }
+
+  handler.sa_flags = 0;
+  syscallCheck = sigaction( SIGPROF, &handler, NULL );
+  if ( syscallCheck == - 1 ) {
+     err( "Registering signal handler (sigaction) failed" );
+  }
+}
+
+void setupTimer() {
+  int syscallCheck;
+  struct itimerval interval;
+  struct timeval frequency = { 0, 500000 };
+  struct timeval value = { 0, 500000 };
+
+  interval.it_interval = frequency;
+  interval.it_value = value;
+
+  syscallCheck = setitimer( ITIMER_PROF, &interval, NULL);
+  if ( syscallCheck == - 1 ) {
+     err( "Setting timer (setitimer) failed" );
+  }
+}
+
 /* Hauptfunktion dient zum initialisieren und starten des ersten Prozesses */
 int main()
 {
-  struct sigaction handler;
-  handler.sa_handler = handleSigprof;
-  sigemptyset( &handler.sa_mask );
-  handler.sa_flags = 0;
-  sigaction( SIGINT, &handler, NULL );
+  registerSigprofHandler();
+  setupTimer();
 
   init_process_switch(); /* Prozessumschaltung initialisieren */
 
