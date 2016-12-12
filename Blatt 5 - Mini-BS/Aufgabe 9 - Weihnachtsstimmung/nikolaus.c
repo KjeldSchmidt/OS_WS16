@@ -4,9 +4,10 @@
 int main() {
   changeOutputColor( 3 );
   printf("******\n");
+  changeOutputColor( 7 );
 
 }
 
-void changeOutputColor( ) {
-  printf("\33[5;33m" );
+void changeOutputColor( int color ) {
+  printf("\33[5;3%dm", color );
 }
