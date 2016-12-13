@@ -37,7 +37,7 @@ void registerSigprofHandler() {
 
   handler.sa_flags = 0;
   syscallCheck = sigaction( SIGPROF, &handler, NULL );
-  if ( syscallCheck == - 1 ) {
+  if ( syscallCheck == -1 ) {
      err( "Registering signal handler (sigaction) failed" );
   }
 }
@@ -52,7 +52,7 @@ void setupTimer() {
   interval.it_value = value;
 
   syscallCheck = setitimer( ITIMER_PROF, &interval, NULL);
-  if ( syscallCheck == - 1 ) {
+  if ( syscallCheck == -1 ) {
      err( "Setting timer (setitimer) failed" );
   }
 }
@@ -90,6 +90,7 @@ int main()
  * Ruft die Hauptfunktion des Prozesses auf (proc->function).
  * Raeumt nach Ende der Hauptfunktion auf (macht den Prozess zum Zombie) */
 void process_wrapper(process_t *proc) {
+  enterKernelBlockSignals();
   process_t *waiting_proc = NULL;
   proc->function(proc->pid); /* Hauptfunktion des Prozesses aufrufen */
 
@@ -102,6 +103,7 @@ void process_wrapper(process_t *proc) {
     waiting_proc->state = STATE_RUNNABLE;
     queue_append(&run_queue, waiting_proc);
   }
+  exitKernelUnblockSignals();
   schedule();
   /* Ein zombie Prozess darf nicht ausgefuehrt werden -> schedule
    * sollte nicht in diesen Prozess zurueckkehren! */
@@ -115,6 +117,7 @@ void process_wrapper(process_t *proc) {
  * process_switch.c auf */
 void schedule()
 {
+  enterKernelBlockSignals();
   process_t *old_proc = NULL; /* bisheriger Prozess */
   /* zu Beginn, wenn noch kein Prozess laeuft ist active_process==NULL */
   if (active_process != NULL) {
@@ -145,16 +148,20 @@ void schedule()
   if (active_process != old_proc) {
     switch_process(old_proc, active_process);
   }
+
+  exitKernelUnblockSignals();
 }
 
 /* naechsten auszufuehrenden Prozess auswaehlen
  * -- waehlt den lauffaehigen Prozess mit der kleinsten PID aus */
 process_t *select_next_process() {
+  enterKernelBlockSignals();
   if (run_queue.first == NULL) {
     return NULL;
   }
 
   return queue_get_process(&run_queue, run_queue.first->pid);
+  exitKernelUnblockSignals();
 }
 
 /*
@@ -166,6 +173,7 @@ process_t *select_next_process() {
 /* Anfuegen von p an das Ende von queue */
 void queue_append(pqueue_t *queue, process_t *p)
 {
+  enterKernelBlockSignals();
   p->next = NULL;
   if (queue->first == NULL) { /* queue is empty */
     queue->first = p;
@@ -175,12 +183,15 @@ void queue_append(pqueue_t *queue, process_t *p)
     queue->last->next = p;
     queue->last = p;
   }
+
+  exitKernelUnblockSignals();
   return;
 }
 
 /* Ersten Eintrag aus queue entfernen und zurueckliefern */
 process_t *queue_get_head(pqueue_t *queue)
 {
+  enterKernelBlockSignals();
   process_t *result = queue->first;
 
   if (queue->first != NULL) {
@@ -189,6 +200,7 @@ process_t *queue_get_head(pqueue_t *queue)
     if (queue->first == NULL)
       queue->last = NULL;
   }
+  exitKernelUnblockSignals();
   return result;
 }
 
@@ -196,6 +208,7 @@ process_t *queue_get_head(pqueue_t *queue)
  * Liefert NULL falls pid nicht in queue */
 process_t *queue_get_process(pqueue_t *queue, int pid)
 {
+  enterKernelBlockSignals();
   process_t *proc;
 
   for ( proc = queue->first; proc != NULL; proc = proc->next) {
@@ -204,6 +217,7 @@ process_t *queue_get_process(pqueue_t *queue, int pid)
       return proc;
     }
   }
+  exitKernelUnblockSignals();
   return NULL;
 }
 
@@ -211,6 +225,7 @@ process_t *queue_get_process(pqueue_t *queue, int pid)
  * Liefert NULL falls pid nicht in queue */
 process_t *queue_get_process_waiting_for(pqueue_t *queue, int waitpid)
 {
+  enterKernelBlockSignals();
   process_t *proc;
 
   for (proc = queue->first; proc != NULL; proc = proc->next) {
@@ -219,6 +234,7 @@ process_t *queue_get_process_waiting_for(pqueue_t *queue, int waitpid)
       return proc;
     }
   }
+  exitKernelUnblockSignals();
   return NULL;
 }
 
@@ -226,6 +242,7 @@ process_t *queue_get_process_waiting_for(pqueue_t *queue, int waitpid)
  * liefert -1 falls process nicht in queue, sonst 0 */
 int queue_dequeue(pqueue_t *queue, process_t *process)
 {
+  enterKernelBlockSignals();
   process_t *result = queue->first;
   process_t *previous = NULL;
 
@@ -245,5 +262,6 @@ int queue_dequeue(pqueue_t *queue, process_t *process)
     previous = result;
     result = result->next;
   }
+  exitKernelUnblockSignals();
   return -1;
 }

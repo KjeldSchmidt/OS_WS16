@@ -3,6 +3,9 @@
 #ifndef __syscalls_h
 #define __syscalls_h
 
+void enterKernelBlockSignals();
+void exitKernelUnblockSignals();
+
 /* Erzeugt neuen Prozess mit Hauptfunktion function */
 int create_process(void (*function)(int));
 

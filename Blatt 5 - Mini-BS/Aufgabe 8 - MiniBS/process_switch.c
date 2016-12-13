@@ -40,7 +40,6 @@ void init_process_switch()
   error_context.uc_stack.ss_size = STACK_SIZE;
 
   makecontext (&error_context, (void (*) (void)) error_function, 0);
-
 }
 
 
@@ -74,7 +73,6 @@ int free_process(process_t *p)
  * ist oldp NULL wird nur newp geladen. */
 void switch_process(process_t *oldp, process_t *newp)
 {
-
   if (oldp == NULL) {
     fprintf(stderr, "Starting with %d\n", newp->pid);
     setcontext(&(newp->context));

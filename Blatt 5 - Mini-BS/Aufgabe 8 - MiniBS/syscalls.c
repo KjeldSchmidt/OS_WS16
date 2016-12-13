@@ -11,9 +11,24 @@
 
 static int next_pid = 0;
 
+void enterKernelBlockSignals() {
+  sigset_t signalSet;
+  sigemptyset( &signalSet );
+  sigaddset( &signalSet, SIGPROF );
+  sigprocmask( SIG_BLOCK, &signalSet, NULL );
+}
+
+void exitKernelUnblockSignals() {
+  sigset_t signalSet;
+  sigemptyset( &signalSet );
+  sigaddset( &signalSet, SIGPROF );
+  sigprocmask( SIG_UNBLOCK, &signalSet, NULL );
+}
+
+
 /* Erzeugt neuen Prozess mit Hauptfunktion function */
-int create_process(void (*function)(int))
-{
+int create_process(void (*function)(int)) {
+  enterKernelBlockSignals();
   int new_pid = next_pid++;
   process_t *new_proc = NULL;
 
@@ -28,7 +43,7 @@ int create_process(void (*function)(int))
   /* in die Warteschlange einfuegen */
   queue_append(&run_queue, new_proc);
 
-
+  exitKernelUnblockSignals();
   return new_pid;
 }
 
@@ -40,7 +55,7 @@ int create_process(void (*function)(int))
  * Funktion einfach ohne aufgeweckt zu werden) */
 void waitpid(int pid)
 {
-
+  enterKernelBlockSignals();
   process_t *result = NULL;
 
   fprintf(stderr, "process %d called waitpid\n", MYPID);
@@ -54,13 +69,14 @@ void waitpid(int pid)
     /* erneut suchen */
     result = queue_get_process(&zombie_queue, pid);
   }
-
+  exitKernelUnblockSignals();
 }
 
 /* gibt "process <pid>: <string>" auf dem Bildschirm aus */
-void println(char *string)
-{
+void println(char *string) {
+  enterKernelBlockSignals();
   fprintf(stderr, "process %d: %s\n", MYPID, string);
+  exitKernelUnblockSignals();
 }
 
 
@@ -87,20 +103,23 @@ signal_t signals[NUM_SIGNALS];
 
 /* Funktion zur Initialisierung des Signal Moduls
  */
-void init_mbs_signal_module()
-{
+void init_mbs_signal_module() {
+  enterKernelBlockSignals();
   int i = 0;
 
-  for (i=0; i < NUM_SIGNALS; i++)
+  for (i=0; i < NUM_SIGNALS; i++) {
     signals[i].used = 0;
+  }
+
+  exitKernelUnblockSignals();
 }
 
 
 /* erzeugt neue Signalvariable (Wert 0) und liefert ihre Nummer zurueck
  * Rueckgabe -1 im Fehlerfall (zu viele Signale vorhanden)
  */
-int mbs_signal_new()
-{
+int mbs_signal_new() {
+  enterKernelBlockSignals();
   int i = 0;
 
 
@@ -112,17 +131,20 @@ int mbs_signal_new()
       return i;
     }
   }
+
+  exitKernelUnblockSignals();
   return -1;
 }
 
 /* Signalvariable mit ID sid freigeben
  * Rueckgabe -1, falls sid ungueltig, 0 sonst
  */
-int mbs_signal_free(int sid)
-{
+int mbs_signal_free(int sid) {
+  enterKernelBlockSignals();
   CHECK_SID(sid);
 
   signals[sid].used = 0;
+  exitKernelUnblockSignals();
   return 0;
 }
 
@@ -130,8 +152,8 @@ int mbs_signal_free(int sid)
  * Rueckgabe -1, falls sid ungueltig oder bereits verwendet (immer nur ein
  * Prozess darf warten!), 0 sonst
  */
-int mbs_swait(int sid)
-{
+int mbs_swait(int sid) {
+  enterKernelBlockSignals();
   CHECK_SID(sid);
 
   if (signals[sid].waiting != NULL)
@@ -148,10 +170,11 @@ int mbs_swait(int sid)
   signals[sid].waiting = NULL;
 
   return 0;
+  exitKernelUnblockSignals();
 }
 
 int mbs_signal(int sid) {
-
+  enterKernelBlockSignals();
   CHECK_SID(sid);
 
   signals[sid].value = 1;
@@ -161,5 +184,6 @@ int mbs_signal(int sid) {
     queue_dequeue(&wait_queue, signals[sid].waiting);
     queue_append(&run_queue, signals[sid].waiting);
   }
+  exitKernelUnblockSignals();
   return 0;
 }
