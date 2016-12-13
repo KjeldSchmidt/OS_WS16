@@ -1,3 +1,5 @@
+#define _POSIX_C_SOURCE 200809L
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -10,11 +12,11 @@
 static int next_pid = 0;
 
 /* Erzeugt neuen Prozess mit Hauptfunktion function */
-int create_process(void (*function)(int)) 
+int create_process(void (*function)(int))
 {
   int new_pid = next_pid++;
   process_t *new_proc = NULL;
-  
+
   fprintf(stderr, "process %d called create_process\n", MYPID);
   /* Prozessstruktur anlegen und initialisieren */
   new_proc = (process_t *) malloc (sizeof(process_t));
@@ -31,12 +33,12 @@ int create_process(void (*function)(int))
 }
 
 /* Wartet auf Beendigung von Prozess pid und gibt die mit pid verbundenen
- * Ressourcen frei.  
+ * Ressourcen frei.
  * Wenn Prozess pid schon beendet wurde kehrt die Funktion gleich zurueck.  Wenn
  * Prozess pid noch nicht beendet ist blockiert die Funktion bis zu dessen Ende.
  * Es wird nicht ueberprueft, ob pid existiert (ist pid ungueltig, blockiert die
  * Funktion einfach ohne aufgeweckt zu werden) */
-void waitpid(int pid) 
+void waitpid(int pid)
 {
 
   process_t *result = NULL;
@@ -56,7 +58,7 @@ void waitpid(int pid)
 }
 
 /* gibt "process <pid>: <string>" auf dem Bildschirm aus */
-void println(char *string) 
+void println(char *string)
 {
   fprintf(stderr, "process %d: %s\n", MYPID, string);
 }
@@ -76,7 +78,7 @@ void println(char *string)
                           return -1; \
                        }
 typedef struct {
-  char used; 
+  char used;
   char value;
   process_t *waiting;
 } signal_t;
@@ -85,7 +87,7 @@ signal_t signals[NUM_SIGNALS];
 
 /* Funktion zur Initialisierung des Signal Moduls
  */
-void init_mbs_signal_module() 
+void init_mbs_signal_module()
 {
   int i = 0;
 
@@ -162,6 +164,3 @@ int mbs_signal(int sid)
   }
   return 0;
 }
-
-
-

@@ -1,12 +1,12 @@
 #ifndef __process_switch_h
 #define __process_switch_h
-
+#define _POSIX_C_SOURCE 200809L
 #include "process_manager.h"
 
 #define STACK_SIZE 8*1024
 
 
-/* Initialisiert statische Daten die innerhalb dieses Moduls verwendet werden 
+/* Initialisiert statische Daten die innerhalb dieses Moduls verwendet werden
  * Muss einmal zu Beginn ausgefuehrt werden bevor andere Funktionen aus dieser
  * Datei ausgefuehrt werden duerfen. */
 void init_process_switch();
