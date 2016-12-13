@@ -4,9 +4,7 @@
 #include <unistd.h>
 
 #define clear() printf("\033[H\033[J")
-
 char tree[1000];
-
 
 int main() {
   while (1) {
@@ -16,34 +14,12 @@ int main() {
   }
 }
 
-char possiblyReplace( char cur ) {
-  if ( cur == '1' ) {
-    changeOutputColor( 1 );
-    return '@';
-  }
-  if ( cur == '2' ) {
-    changeOutputColor( 2 );
-    return '@';
-  }
-  if ( cur == '3' ) {
-    changeOutputColor( 3 );
-    return '@';
-  }
-  if ( cur == '4' ) {
-    changeOutputColor( 4 );
-    return '@';
-  }
-  if ( cur == '5' ) {
-    changeOutputColor( 5 );
-    return '@';
-  }
-  if ( cur == '6' ) {
-    changeOutputColor( 6 );
-    return '@';
-  }
-  if ( cur == '7' ) {
-    changeOutputColor( 7 );
-    return '@';
+char replaceColorCharWithNothingAndChangeColorOfTerminalOutput( char cur ) {
+  for ( int i = 1; i < 8; ++i ) {
+    if ( cur == 48 + i ) {
+      changeOutputColor( i );
+      return '@';
+    }
   }
   if ( cur == '8' ) {
     randomOutputColor();
@@ -60,26 +36,24 @@ void changeOutputColor( int color ) {
   printf("\33[5;3%dm", color );
 }
 
-void printTree() {
-  char *cur = tree;
+void printTreeLine() {
+  char *cur;
   char print;
-  print = possiblyReplace( *cur );
-  if ( print != '@' ) {
-    printf("%c", possiblyReplace( *cur ) );
-  }
-  do {
-    cur++;
-    print = possiblyReplace( *cur );
+
+  for ( cur = tree; *cur != '\n'; ++cur ) {
+    print = replaceColorCharWithNothingAndChangeColorOfTerminalOutput( *cur );
     if ( print != '@' ) {
-      printf("%c", possiblyReplace( *cur ) );
+      printf("%c", replaceColorCharWithNothingAndChangeColorOfTerminalOutput( *cur ) );
     }
-  } while ( *cur != '\n' );
+  }
+  printf("\n");
+
 }
 
 
 void loadTree() {
   FILE *file = fopen( "tree.txt", "r" );
-  while ( fgets( tree, 100000, file ) != NULL ) {
-    printTree();
+  while ( fgets( tree, 1000, file ) != NULL ) {
+    printTreeLine();
   }
 }
