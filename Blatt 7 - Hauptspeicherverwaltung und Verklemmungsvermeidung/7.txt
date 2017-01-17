@@ -1,26 +1,83 @@
 A11)
 
+Ein Punkt bedeutet, dass die gesuchte Seite bereits in einem Frame vorhanden ist. Eine Zahl gibt an, dass ein Seitenfehler stattfand, und welche Seite nun in dem Frame geladen ist. Ausnahme: Die ersten drei Seitenzugriffe stellen keinen Seitenfehler dar.
+
 FIFO:
 
-F
-1 x5  2  1  6    1
-2 x 6  5  2   5   6
-3 x  4  6  4    2
+F  564256512464562156
+1 x5  2   1  6  . 1
+2 x 6  5 . 2   5   .6
+3 x  4  6   4 .  2
 
 Page Faults: 11
 
 LFU
-
-1 x5  2 6  46
-2 x 6  5
-3 x  4   12  421
+   564256512464562156
+1 x5  2 6   46  .   .
+2 x 6  5       .   .  
+3 x  4   .12  4  21
 
 Page Faults: 10
 
 LRU
-
-1 x5  2  1  6   6
-2 x 6  5   4  2  5
-3 x  4  6 2  5 1
+   564256512464562156
+1 x5  2   1  6  .  5
+2 x 6  5 .  4 .  2  2
+3 x  4  6  2   5  1
 
 Page Faults: 12
+
+A12a) 
+
+HS/MS - Hat/Maximal Scanner
+Gleiches für Modem, Drucker, Festplatte.
+
+	|HS  MS |HM  MM |HD  MD |HF  MF |
+	| 		|		|		|		|
+A	|0	 1	|0	 1	|		|		|
+B	|1	 2	|		|1	 1	|	 	|
+C	|		|1	 1	|		|1	 1	|
+D	|1	 1	|		|2	 2	|0	 1	|
+E	|		|0	 1	|0	 3	|1	 1	|
+
+Frei: 	0		0		0		1
+
+Mit den freien und bereits vergebenenen Mitteln lassen sich C und D in beliebiger Reihenfolge ausführen, woraus folgt:
+
+	|HS  MS |HM  MM |HD  MD |HF  MF |
+	| 		|		|		|		|
+A	|0	 1	|0	 1	|		|		|
+B	|1	 2	|		|1	 1	|	 	|
+C	|		|		|		|		|
+D	|		|		|		|		|
+E	|		|0	 1	|0	 3	|1	 1	|
+
+Frei: 	1		1		2		2
+
+Damit ist nun B ausführbar - danach ist die Reihenfolge von A und E wieder frei wählbar, und alle Prozesse sind volständig erfüllt. Damit ist die ursprüngliche Situation sicher.
+
+A12b)
+
+	|HS  MS |HM  MM |HD  MD |HF  MF |
+	| 		|		|		|		|
+A	|0	 1	|0	 1	|		|		|
+B	|1	 2	|		|1	 1	|1	 1	|
+C	|		|1	 1	|		|1	 1	|
+D	|1	 1	|		|2	 2	|0	 2	|
+E	|		|0	 1	|0	 3	|2	 2	|
+
+Frei: 	0		0		0		0
+
+Hier ist nur C ausführbar, woraus sich folgende Situation ergibt:
+
+	|HS  MS |HM  MM |HD  MD |HF  MF |
+	| 		|		|		|		|
+A	|0	 1	|0	 1	|		|		|
+B	|1	 2	|		|1	 1	|1	 1	|
+C	|		|		|		|		|
+D	|1	 1	|		|2	 2	|0	 2	|
+E	|		|0	 1	|0	 3	|2	 2	|
+
+Frei: 	0		1		0		1
+
+Damit sind wir in einem unsicherem Zustand.
