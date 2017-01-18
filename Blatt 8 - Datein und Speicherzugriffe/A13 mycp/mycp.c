@@ -14,7 +14,7 @@ void error(char *msg) {
   exit(EXIT_FAILURE);
 }
 
-void main( int argc, char* argv[] ) {
+int main( int argc, char* argv[] ) {
   if ( argc != 3 ) {
     error( "Incorrect number of arguments given. Please specify source and target." );
   }
@@ -30,21 +30,21 @@ void main( int argc, char* argv[] ) {
   openSource( sourcePath );
   createTarget( targetPath );
 
-  getSourceLength( int fileDescriptor );
-  setTargetSize( size_t targetFDSize );
+  getSourceLength( sourceFD );
+  setTargetSize( sourceInfo->st_size );
 
   sourceMapAddress = mapFileToMemory( sourceFD, MAP_PRIVATE );
   targetMapAddress = mapFileToMemory( targetFD, MAP_SHARED );
 
-  copyFilesInMemory( int sourceFD, int targetFD );
+  copyFilesInMemory( sourceFD, targetFD );
 
   //cleanup:
-  success = munmap( targetMapAddress, sourceInfo.st_size );
+  success = munmap( targetMapAddress, sourceInfo->st_size );
   if ( success == -1 ) {
     error( "Unmapping target failed." );
   }
 
-  success = munmap( sourceMapAddress, sourceInfo.st_size );
+  success = munmap( sourceMapAddress, sourceInfo->st_size );
   if ( success == -1 ) {
     error( "Unmapping source failed." );
   }
@@ -58,6 +58,8 @@ void main( int argc, char* argv[] ) {
   if ( success == -1 ) {
     error( "Closing source failed." );
   }
+
+  return 0;
 }
 
 int openSource( char *path ) {
@@ -91,7 +93,7 @@ int createTarget( char *path ) {
   return fileDescriptor;
 }
 
-void getSourceLength( size_t fileDescriptor ) {
+void getSourceLength( int fileDescriptor ) {
   int success = 0;
   success = fstat( sourceFD, sourceInfo );
 
@@ -102,7 +104,7 @@ void getSourceLength( size_t fileDescriptor ) {
 
 void setTargetSize( size_t targetSize ) {
   off_t success = 0;
-  success = lseek( targetFD, sourceInfo.st_size, SEEK_END );
+  success = lseek( targetFD, targetSize, SEEK_END );
   if ( success == -1 ) {
     error( "Setting target size failed (lseek)" );
   }
@@ -115,15 +117,15 @@ void setTargetSize( size_t targetSize ) {
 }
 
 void *mapFileToMemory( int fileDescriptor, int flag ) {
-  int mapAddress = 0;
-  mapAddress = mmap( NULL, sourceInfo.st_size, PROT_NONE, flag, fileDescriptor, 0 );
-  if ( mapAddress == -1 ) {
+  void *mapAddress = 0;
+  mapAddress = mmap( NULL, sourceInfo->st_size, PROT_NONE, flag, fileDescriptor, 0 );
+  if ( mapAddress == (void *) -1 ) {
     error( "mapping file failed" );
   }
   return mapAddress;
 }
 
 void copyFilesInMemory( int sourceFD, int targetFD ) {
-  memcpy( targetMapAddress, sourceMapAddress, sourceInfo.st_size );
+  memcpy( targetMapAddress, sourceMapAddress, sourceInfo->st_size );
   // No check for error code - man page does not explain any errors or faulty return values.
 }
