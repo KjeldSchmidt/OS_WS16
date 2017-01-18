@@ -16,7 +16,7 @@ void readArgs();
 int openSource( char *path );
 int createTarget( char *path );
 void getSourceLength( int fileDescriptor );
-void setTargetSize( size_t targetSize );
+void setTargetSize( off_t targetSize );
 void *mapFileToMemory( int fileDescriptor, int flag );
 void copyFilesInMemory( int source, int target );
 

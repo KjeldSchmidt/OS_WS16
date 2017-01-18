@@ -7,7 +7,7 @@ int sourceFD;
 int targetFD;
 void *sourceMapAddress;
 void *targetMapAddress;
-struct stat *sourceInfo = NULL;
+struct stat sourceInfo;
 
 void error(char *msg) {
   perror(msg);
@@ -21,8 +21,8 @@ int main( int argc, char* argv[] ) {
 
   //initialize?
   int success = 0;
-  sourcePath = argv[0];
-  targetPath = argv[1];
+  sourcePath = argv[1];
+  targetPath = argv[2];
 
 
   //main stuff:
@@ -31,7 +31,7 @@ int main( int argc, char* argv[] ) {
   createTarget( targetPath );
 
   getSourceLength( sourceFD );
-  setTargetSize( sourceInfo->st_size );
+  setTargetSize( (off_t) sourceInfo.st_size );
 
   sourceMapAddress = mapFileToMemory( sourceFD, MAP_PRIVATE );
   targetMapAddress = mapFileToMemory( targetFD, MAP_SHARED );
@@ -39,12 +39,12 @@ int main( int argc, char* argv[] ) {
   copyFilesInMemory( sourceFD, targetFD );
 
   //cleanup:
-  success = munmap( targetMapAddress, sourceInfo->st_size );
+  success = munmap( targetMapAddress, sourceInfo.st_size );
   if ( success == -1 ) {
     error( "Unmapping target failed." );
   }
 
-  success = munmap( sourceMapAddress, sourceInfo->st_size );
+  success = munmap( sourceMapAddress, sourceInfo.st_size );
   if ( success == -1 ) {
     error( "Unmapping source failed." );
   }
@@ -75,7 +75,7 @@ int openSource( char *path ) {
 int createTarget( char *path ) {
   int fileDescriptor = 0;
   if (0 == access(path, 0)) {
-    error( "Target file already exists. Specify another targetFD and try again." );
+    error( "Target file already exists. Specify another target and try again." );
   }
   else {
     /*
@@ -84,9 +84,9 @@ int createTarget( char *path ) {
      *  S_IRWXU: The user who executed this programm will have full control over the newly created file
      *    Which is desireable, since the users copy should be his.
      */
-    fileDescriptor = open( path, O_RDWR || O_CREAT, S_IRWXU );
-    if ( fileDescriptor == -1 ) {
-      error( "Target file could not be created." );
+    fileDescriptor = open( path, O_RDWR | O_CREAT, S_IRWXU );
+    if ( fileDescriptor < 1 ) {
+      error( "Target file could not be created" );
     }
   }
 
@@ -95,17 +95,18 @@ int createTarget( char *path ) {
 
 void getSourceLength( int fileDescriptor ) {
   int success = 0;
-  success = fstat( sourceFD, sourceInfo );
+  success = fstat( sourceFD, &sourceInfo );
 
   if ( success == -1 ) {
     error("Getting source length failed.");
   }
 }
 
-void setTargetSize( size_t targetSize ) {
+void setTargetSize( off_t targetSize ) {
   off_t success = 0;
+  printf("TargetFD: %d\n", targetFD );
   success = lseek( targetFD, targetSize, SEEK_END );
-  if ( success == -1 ) {
+  if ( success == (off_t) -1 ) {
     error( "Setting target size failed (lseek)" );
   }
 
@@ -118,7 +119,7 @@ void setTargetSize( size_t targetSize ) {
 
 void *mapFileToMemory( int fileDescriptor, int flag ) {
   void *mapAddress = 0;
-  mapAddress = mmap( NULL, sourceInfo->st_size, PROT_NONE, flag, fileDescriptor, 0 );
+  mapAddress = mmap( NULL, sourceInfo.st_size, PROT_NONE, flag, fileDescriptor, 0 );
   if ( mapAddress == (void *) -1 ) {
     error( "mapping file failed" );
   }
@@ -126,6 +127,6 @@ void *mapFileToMemory( int fileDescriptor, int flag ) {
 }
 
 void copyFilesInMemory( int sourceFD, int targetFD ) {
-  memcpy( targetMapAddress, sourceMapAddress, sourceInfo->st_size );
+  memcpy( targetMapAddress, sourceMapAddress, sourceInfo.st_size );
   // No check for error code - man page does not explain any errors or faulty return values.
 }
