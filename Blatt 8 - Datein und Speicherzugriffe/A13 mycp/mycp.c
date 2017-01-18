@@ -28,11 +28,11 @@ void main( int argc, char* argv[] ) {
     //close both files
 }
 
-int openSource( char *path[] ) {
+int openSource( char *path ) {
 
 }
 
-int createTarget( char *path[] ) {
+int createTarget( char *path ) {
 
 }
 
