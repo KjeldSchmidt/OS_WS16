@@ -6,6 +6,8 @@ OBJS = mycp.o
 mycp: $(OBJS)
 	$(CC) $(CFLAGS) $(CLIBS) -o $@ $(OBJS)
 
+mycp.o: mycp.c mycp.h
+	$(CC) $(CFLAGS) $(CLIBS) -c mycp.c
 
 clean:
 	-rm *.o *~ tree
