@@ -3,10 +3,10 @@
 
 int openSource( char *path[] );
 int createTarget( char *path[] );
-int getSourceLength( size_t fileDescriptor );
+int getSourceLength( int fileDescriptor );
 int setTargetSize( size_t targetSize );
-int mapFileToMemory( size_t fileDescriptor );
-int copyFilesInMemory( size_t source, size_t target );
+int mapFileToMemory( int fileDescriptor );
+int copyFilesInMemory( int source, int target );
 
 
 #endif
