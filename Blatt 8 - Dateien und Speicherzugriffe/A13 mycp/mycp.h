@@ -18,7 +18,7 @@ int createTarget( char *path );
 void getSourceLength( int fileDescriptor );
 void setTargetSize( off_t targetSize );
 void *mapFileToMemory( int fileDescriptor, int flag );
-void copyFilesInMemory( int source, int target );
+void copyFilesInMemory( const void *source, void *target );
 
 
 #endif

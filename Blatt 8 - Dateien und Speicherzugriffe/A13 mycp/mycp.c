@@ -38,7 +38,7 @@ int main( int argc, char* argv[] ) {
   // MAP_SHARED means that changed to memory WILL change the file.
   targetMapAddress = mapFileToMemory( targetFD, MAP_SHARED );
 
-  copyFilesInMemory( sourceFD, targetFD );
+  copyFilesInMemory( sourceMapAddress, targetMapAddress );
 
   //cleanup:
   success = munmap( targetMapAddress, sourceInfo.st_size );
@@ -100,36 +100,38 @@ void getSourceLength( int fileDescriptor ) {
   success = fstat( sourceFD, &sourceInfo );
 
   if ( success == -1 ) {
-    error("Getting source length failed.");
+    error("Getting source length failed");
   }
 }
 
 void setTargetSize( off_t targetSize ) {
   off_t success = 0;
-  printf("sourceFD: %d\n", sourceFD );
-  printf("TargetFD: %d\n", targetFD );
-  success = lseek( targetFD, targetSize, SEEK_END );
+  success = lseek( targetFD, targetSize - 1, SEEK_END );
   if ( success == (off_t) -1 ) {
     error( "Setting target size failed (lseek)" );
   }
 
   int bytesWritten = 0;
-  bytesWritten = write( targetFD, (char) 0, 1);
+  char byteToWrite = 0;
+  bytesWritten = write( targetFD, &byteToWrite, 1);
   if (bytesWritten != 1) {
-    error( "Writing to file end failed." );
+    error( "Writing to file end failed" );
   }
 }
 
 void *mapFileToMemory( int fileDescriptor, int flag ) {
   void *mapAddress = 0;
-  mapAddress = mmap( NULL, sourceInfo.st_size, PROT_NONE, flag, fileDescriptor, 0 );
+  mapAddress = mmap( NULL, (size_t) sourceInfo.st_size, PROT_READ | PROT_WRITE, flag, fileDescriptor, 0 );
   if ( mapAddress == (void *) -1 ) {
     error( "mapping file failed" );
   }
   return mapAddress;
 }
 
-void copyFilesInMemory( int sourceFD, int targetFD ) {
-  memcpy( targetMapAddress, sourceMapAddress, sourceInfo.st_size );
+void copyFilesInMemory( const void *sourceAddress, void *targetAddress ) {
+  printf( "sourcePointer: %p\n", sourceAddress );
+  printf( "targetPointer: %p\n", targetAddress );
+  printf( "size: %lu\n", (size_t) sourceInfo.st_size );
+  memcpy( targetAddress, sourceAddress, (size_t) sourceInfo.st_size );
   // No check for error code - man page does not explain any errors or faulty return values.
 }
