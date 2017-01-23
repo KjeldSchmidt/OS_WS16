@@ -27,13 +27,15 @@ int main( int argc, char* argv[] ) {
 
   //main stuff:
 
-  openSource( sourcePath );
-  createTarget( targetPath );
+  sourceFD = openSource( sourcePath );
+  targetFD = createTarget( targetPath );
 
   getSourceLength( sourceFD );
   setTargetSize( (off_t) sourceInfo.st_size );
 
+  // MAP_PRIVATE means that changes to memory will not change the file.
   sourceMapAddress = mapFileToMemory( sourceFD, MAP_PRIVATE );
+  // MAP_SHARED means that changed to memory WILL change the file.
   targetMapAddress = mapFileToMemory( targetFD, MAP_SHARED );
 
   copyFilesInMemory( sourceFD, targetFD );
@@ -85,7 +87,7 @@ int createTarget( char *path ) {
      *    Which is desireable, since the users copy should be his.
      */
     fileDescriptor = open( path, O_RDWR | O_CREAT, S_IRWXU );
-    if ( fileDescriptor < 1 ) {
+    if ( fileDescriptor == -1 ) {
       error( "Target file could not be created" );
     }
   }
@@ -104,6 +106,7 @@ void getSourceLength( int fileDescriptor ) {
 
 void setTargetSize( off_t targetSize ) {
   off_t success = 0;
+  printf("sourceFD: %d\n", sourceFD );
   printf("TargetFD: %d\n", targetFD );
   success = lseek( targetFD, targetSize, SEEK_END );
   if ( success == (off_t) -1 ) {
