@@ -129,9 +129,6 @@ void *mapFileToMemory( int fileDescriptor, int flag ) {
 }
 
 void copyFilesInMemory( const void *sourceAddress, void *targetAddress ) {
-  printf( "sourcePointer: %p\n", sourceAddress );
-  printf( "targetPointer: %p\n", targetAddress );
-  printf( "size: %lu\n", (size_t) sourceInfo.st_size );
   memcpy( targetAddress, sourceAddress, (size_t) sourceInfo.st_size );
   // No check for error code - man page does not explain any errors or faulty return values.
 }
