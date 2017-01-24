@@ -1,0 +1,65 @@
+a)
+
+p(k) = 1/15k
+
+t_erfolg = 50ns
+t_pagefault = 10000000ns
+
+Verlangsamungsfakor: 
+
+= ( 50ns + 10000000ns*(1/15k) ) / 50ns - 1
+= 1 + 200000*(1/15k) - 1
+= 200000*(1/15k)
+~ 1333/k
+
+Also ist die Laufzeit um circa den Faktor 1333/k erhöht.
+
+b)
+
+Würde man nun die Laufzeit optimieren wollen, würde sich folgendes Ergeben:
+
+  Verdoppelte Kachelzahl: 1333/2k ~ 666/k
+
+
+Der nächste Punkt ist uneindeutig formuliert: Wird die Verarbeitungszeit des Seitenfehlers verbessert oder die Ausführungszeit ohne Seitenfehler?
+
+  Ausführung in Geschwindigkeit verdoppelt: 2666/k
+  Austausch in Geschwindigkeit verdoppelt: 666/k
+
+Dies beschreibt allerdings nur den Verlangsamungsfaktor durch Seitenfehler, was keine übermäßig nützliche Metrik ist. Betrachten wir stattdessen die durchschnittliche Laufzeit pro Befehel:
+
+Vor Optimierung: 
+
+  50ns + 10000000ns * 1/15k
+~ 50ns + 666666ns/k
+
+Mit doppelter Kachelzahl:
+
+  50ns + 10000000ns * 1/30k
+~ 50ns + 333333ns/k
+
+Ausführungsgeschwindigkeit verdoppelt:
+
+  25ns + 10000000ns * 1/15k
+~ 25ns + 666666ns/k  
+
+Austauschgeschwindigkeit verdoppelt:
+
+  50ns + 5000000ns * 1/15k
+~ 50ns + 333333ns/k
+
+Man sieht also sofort, dass das Verdoppeln der Austauschgeschwindigkeit und das verdoppeln der Kacheln den gleichen Effekt hat.
+
+Setzen wir nun gleich:
+
+50ns + 333333ns/k = 25ns + 666666ns/k
+25 + 333333/k = 666666/k
+25k = 333333
+k = 13334
+
+Der Effekt ist also (ungefähr) gleich, wenn die Kachelzahl bisher 13334 beträgt.
+
+Ist sie geringer, dann ist es effektiver die Kachelzahl zu erhöhen.
+Ist sie höher, dann ist es effektiver, die Befehlsausführung schneller zu gestalten.
+
+Da wir die Wahrscheinlichkeit eines Seitenfehlers bereits kennen, ist auch nicht zu bedenken, ob die erhöhte Kachelanzahl auch von Nutzen ist; Wäre sie es nicht, wäre die Wahrscheinlichkeit eines Seitenfehlers zu Beginn der Aufgabe geringer.
